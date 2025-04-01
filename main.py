@@ -1,6 +1,6 @@
 import requests
 import sqlite3
-import pandas as pd
+#import pandas as pd
 
 
 def make_url(url):
@@ -97,7 +97,9 @@ def update_db(keys, data, db):
 
 if __name__ == '__main__':
     mydb = 'stats.db'
-    puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
+    habib4d_puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
+    SussyBaka2_puuid = "pntMCPZS4W3MPpYWYyHTkzqrod8CzRl7Cxt1QhULmyzaS_S7EmIaI19ngDu1v2NThAZhfjpTllPkEg"
+    puuid = SussyBaka2_puuid #change this to habib to work with yours
     region = 'americas'
     match_ids = get_match_ids(puuid, region, 20)
 
