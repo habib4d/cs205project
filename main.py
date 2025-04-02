@@ -119,7 +119,10 @@ def summoners_in_league(queue, tier, division):
             break
     return summoners
 
+
+
 def masters_puuids_retrieval(region, count):
+    '''Might be Obselete Function if summoners_in_league works for master/gm/chal ranks'''
     queue = "RANKED_SOLO_5x5"
     if region == 'americas':
         region = 'na1'
