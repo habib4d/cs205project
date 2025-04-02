@@ -101,7 +101,7 @@ if __name__ == '__main__':
     SussyBaka2_puuid = "pntMCPZS4W3MPpYWYyHTkzqrod8CzRl7Cxt1QhULmyzaS_S7EmIaI19ngDu1v2NThAZhfjpTllPkEg"
     puuid = SussyBaka2_puuid #change this to habib to work with yours
     region = 'americas'
-    match_ids = get_match_ids(puuid, region, 20)
+    match_ids = get_match_ids(puuid, region, 50)
 
     keys, data = get_match_data(puuid, match_ids, region)
     update_db(keys, data, mydb)
