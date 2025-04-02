@@ -67,7 +67,7 @@ def get_match_data(puuid, match_ids, region):
     for id in match_ids:
         raw_data = get_match_raw(id, region)
         player_data = find_player_data(raw_data, puuid)
-        print(player_data)
+        #print(player_data)
 
         for i in range(len(player_data)):
             key = keys[i]
@@ -126,9 +126,9 @@ if __name__ == '__main__':
     SussyBaka2_puuid = "pntMCPZS4W3MPpYWYyHTkzqrod8CzRl7Cxt1QhULmyzaS_S7EmIaI19ngDu1v2NThAZhfjpTllPkEg"
     #puuid = SussyBaka2_puuid #change this to habib to work with yours
     region = 'americas'
-    masters_puuids = masters_puuids_retrieval(region, 30)
+    masters_puuids = masters_puuids_retrieval(region, 100)
     for puuid in masters_puuids:
-            match_ids = get_match_ids(puuid, region, 5)
+            match_ids = get_match_ids(puuid, region, 1)
 
             keys, data = get_match_data(puuid, match_ids, region)
             update_db(keys, data, mydb)
