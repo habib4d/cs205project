@@ -1,9 +1,13 @@
 import requests
 import sqlite3
+import time
 #import pandas as pd
 
 
 def make_url(url):
+    '''
+    Adds an api key to a url
+    '''
     with open('.api_key.txt', 'r') as f:
         api_key = f.read()
 
@@ -17,7 +21,6 @@ def get_puuid(summoner_name, tag, region):
     url = (f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}')
     api_url = make_url(url)
     resp = requests.get(api_url)
-    return resp
     player_info = resp.json()
     return player_info['puuid']
 
@@ -92,6 +95,29 @@ def update_db(keys, data, db):
             return
         
     conn.commit()
+
+def summoners_in_league(queue, tier, division):
+    '''
+    Returns a list of all puuids for each summoner in a tier and division
+    queue: 'RANKED_SOLO_5x5'
+    tier: 'IRON', 'GOLD', 'MASTER', etc...
+    division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
+    '''
+    page = 1
+    summoners = []
+    while True:
+        url = f'https://na1.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
+        api_url = make_url(url)
+        resp = [ e['puuid'] for e in requests.get(api_url).json() ]
+
+        if resp:
+            summoners += resp
+            page += 1
+            if page == 90:
+                time.sleep(120) # makes sure to not exceed request limit
+        else:
+            break
+    return summoners
 
 def masters_puuids_retrieval(region, count):
     queue = "RANKED_SOLO_5x5"
