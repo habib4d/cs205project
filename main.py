@@ -41,7 +41,8 @@ def get_match_ids(puuid, region, count):
         f"/ids?start=0&count={count}"
     )
     api_url = make_url(url)
-
+    print(puuid)
+    page = 1
     resp = requests.get(api_url)
     match_ids = resp.json()
     return match_ids
@@ -135,32 +136,9 @@ def summoners_in_league(queue, tier, division):
             break
     return summoners
 
-def masters_puuids_retrieval(region, count):
-    queue = "RANKED_SOLO_5x5"
-    if region == 'americas':
-        region = 'na1'
-    url = (
-        "https://" +
-        region +
-        ".api.riotgames.com/lol/league/v4/masterleagues/by-queue/" + 
-        queue
-    )
-    api_url = make_url(url)
-    print(api_url)
-    print("https://na1.api.riotgames.com/lol/league/v4/masterleagues/by-queue/RANKED_SOLO_5x5?api_key=RGAPI-2711f6ce-843f-4a6f-8317-0fa47b9f070b")
-    resp = requests.get(api_url)
-    masters_player_data = resp.json()
-    list_of_masters_puuids = []
-    i = 0
-    while i < count:
-        if (masters_player_data["entries"][i]["inactive"]) == True:
-            i += 1
-            count += 1
-            continue
-        else:
-            list_of_masters_puuids.append(masters_player_data["entries"][i]["puuid"])
-            i += 1
-    return list_of_masters_puuids
+
+
+
 
 if __name__ == '__main__':
     mydb = 'stats.db'
@@ -168,23 +146,25 @@ if __name__ == '__main__':
     SussyBaka2_puuid = "pntMCPZS4W3MPpYWYyHTkzqrod8CzRl7Cxt1QhULmyzaS_S7EmIaI19ngDu1v2NThAZhfjpTllPkEg"
     #puuid = SussyBaka2_puuid #change this to habib to work with yours
     region = 'americas'
-    masters_puuids = masters_puuids_retrieval(region, 100)
-    for puuid in masters_puuids:
-            match_ids = get_match_ids(puuid, region, 1)
 
-            keys, data = get_match_data(puuid, match_ids, region)
-            update_db(keys, data, mydb)
-
-    #masters_puuids_retrieval(region, 30)
-
+    # retrieves all puuids of a certain rank
+    masters_puuids = summoners_in_league('RANKED_SOLO_5x5', 'MASTER', "I")
+    master_match_ids = []
+    for puuid in masters_puuids[0:3]:
+        #grabs 100 matches per puuid for the first 3 puuids
+        #time sleep 120 to not over do rate limit
+        match_id = get_match_ids(puuid, region, 100)
+        master_match_ids.append(match_id)
+        time.sleep(120)
+    print(master_match_ids)
     conn = sqlite3.connect(mydb)
     cursor = conn.cursor()
 
     try:
-        cursor.execute(''' select * from player_game_stats; ''')
+        cursor.execute(' select * from player_game_stats; ')
     except sqlite3.Error as er:
         conn.close()
-        f'SQL error: {er}'
+        f'SQL error: {er}' 
     
     result = cursor.fetchall()
     print(result)
