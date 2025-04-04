@@ -33,7 +33,8 @@ def get_match_ids(puuid, region, count):
         f"/ids?start=0&count={count}"
     )
     api_url = make_url(url)
-
+    print(puuid)
+    page = 1
     resp = requests.get(api_url)
     match_ids = resp.json()
     return match_ids
@@ -133,10 +134,13 @@ if __name__ == '__main__':
     # retrieves all puuids of a certain rank
     masters_puuids = summoners_in_league('RANKED_SOLO_5x5', 'MASTER', "I")
     master_match_ids = []
-    for puuid in masters_puuids:
-        match_id = get_match_ids(puuid, region, 1)
+    for puuid in masters_puuids[0:3]:
+        #grabs 100 matches per puuid for the first 3 puuids
+        #time sleep 120 to not over do rate limit
+        match_id = get_match_ids(puuid, region, 100)
         master_match_ids.append(match_id)
-
+        time.sleep(120)
+    print(master_match_ids)
     conn = sqlite3.connect(mydb)
     cursor = conn.cursor()
 
