@@ -179,6 +179,8 @@ if __name__ == '__main__':
             f'SQL error: {er}'
 
         time.sleep(1.2)
+    
+    cursor.commit()
 
 
     try:
@@ -188,4 +190,6 @@ if __name__ == '__main__':
         f'SQL error: {er}' 
     
     result = cursor.fetchall()
+    cursor.close()
     print(result)
+    
