@@ -18,6 +18,10 @@ def make_url(url):
     return f'{url}{c}api_key={api_key}'
 
 def get_puuid(summoner_name, tag, region):
+    '''
+    Returns puuid give name#tag and the region
+    valid regions: 'americas', 'asia', 'europe', 'esports'
+    '''
     url = (f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}')
     api_url = make_url(url)
     resp = requests.get(api_url)
@@ -25,6 +29,10 @@ def get_puuid(summoner_name, tag, region):
     return player_info['puuid']
 
 def get_match_ids(puuid, region, count):
+    '''
+    Returns a list of match ids with size given puuid and region
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    '''
     url = (
         "https://" +
         region +
@@ -39,6 +47,10 @@ def get_match_ids(puuid, region, count):
     return match_ids
 
 def get_match_raw(match_id, region):
+    '''
+    Returns a dictionary of all of the match data given match_id and region
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    '''
     url = (
         "https://" + 
         region + 
@@ -52,6 +64,10 @@ def get_match_raw(match_id, region):
     return match_data
 
 def find_player_data(match_data, puuid):
+    '''
+    Given match data and a puuid for a player from that match returns a list
+    return list: [champion played, kills, deaths, assists, win/loss]
+    '''
     players = match_data['metadata']['participants']
     i = players.index(puuid)
 
