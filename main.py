@@ -129,9 +129,10 @@ def update_db(keys, data, db):
         
     conn.commit()
 
-def summoners_in_league(queue, tier, division):
+def summoners_in_league(region, queue, tier, division):
     '''
     Returns a list of all puuids for each summoner in a tier and division
+    valid regions: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
     queue: 'RANKED_SOLO_5x5'
     tier: 'IRON', 'GOLD', 'MASTER', etc...
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
