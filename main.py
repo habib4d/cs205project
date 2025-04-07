@@ -180,7 +180,7 @@ if __name__ == '__main__':
 
         time.sleep(1.2)
     
-    cursor.commit()
+    conn.commit()
 
 
     try:
