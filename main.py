@@ -17,16 +17,32 @@ def make_url(url):
 
     return f'{url}{c}api_key={api_key}'
 
+
 def get_puuid(summoner_name, tag, region):
     '''
-    Returns puuid give name#tag and the region
+    Returns puuid given name#tag and region
     valid regions: 'americas', 'asia', 'europe', 'esports'
     '''
-    url = (f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}')
+    url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}'
     api_url = make_url(url)
     resp = requests.get(api_url)
     player_info = resp.json()
     return player_info['puuid']
+
+
+def get_ign(puuid,  region):
+    '''
+    Returns ign and tag geven puuid and region
+    valid regions: 'americas', 'asia', 'europe', 'esports'
+    '''
+    url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}'
+    api_url = make_url(url)
+    resp = requests.get(api_url)
+    result = resp.json()
+    ign, tag = result['gameName'], result['tagLine']
+
+    return ign, tag
+
 
 def get_match_ids(puuid, region, count):
     '''
@@ -130,11 +146,12 @@ def summoners_in_league(queue, tier, division):
         if resp:
             summoners += resp
             page += 1
-            if page == 90:
+            if (page % 99) == 0:
                 time.sleep(120) # makes sure to not exceed request limit
         else:
             break
     return summoners
+
 
 
 
