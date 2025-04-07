@@ -44,8 +44,12 @@ def get_ign(puuid,  region):
     url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}'
     api_url = make_url(url)
     resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(resp.satus_code)
+
     result = resp.json()
-    ign, tag = result['gameName'], result['tagLine']
+    ign = result['gameName']
+    tag = result['tagLine']
 
     return ign, tag
 
@@ -148,7 +152,7 @@ def summoners_in_league(server, queue, tier, division):
     while True:
         url = f'https://{server}.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
         api_url = make_url(url)
-        resp = [ e['puuid'] for e in requests.get(api_url).json() ]
+        resp = [ [e['puuid'], e['leaguePoints']] for e in requests.get(api_url).json() ]
 
         if resp:
             summoners += resp
