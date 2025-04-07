@@ -3,6 +3,12 @@ import sqlite3
 import time
 #import pandas as pd
 
+def server_to_region(server):
+    d = {'br1': 'americas', 'eun1': 'europe', 'euw1': 'europe' , 'jp1': 'asia', 
+         'kr': 'asia', 'la1': 'americas', 'la2': 'americas', 'me1': 'asia', 
+         'na1': 'americas', 'oc1': 'asia', 'ru': 'asia', 'sg2': 'asia', 
+         'tr1': 'europe', 'tw2': 'asia', 'vn2': 'asia'}
+    return d[server]
 
 def make_url(url):
     '''
@@ -17,16 +23,36 @@ def make_url(url):
 
     return f'{url}{c}api_key={api_key}'
 
+
 def get_puuid(summoner_name, tag, region):
     '''
-    Returns puuid give name#tag and the region
+    Returns puuid given name#tag and region
     valid regions: 'americas', 'asia', 'europe', 'esports'
     '''
-    url = (f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}')
+    url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}'
     api_url = make_url(url)
     resp = requests.get(api_url)
     player_info = resp.json()
     return player_info['puuid']
+
+
+def get_ign(puuid,  region):
+    '''
+    Returns ign and tag geven puuid and region
+    valid regions: 'americas', 'asia', 'europe', 'esports'
+    '''
+    url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}'
+    api_url = make_url(url)
+    resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(resp.satus_code)
+
+    result = resp.json()
+    ign = result['gameName']
+    tag = result['tagLine']
+
+    return ign, tag
+
 
 def get_match_ids(puuid, region, count):
     '''
@@ -113,9 +139,10 @@ def update_db(keys, data, db):
         
     conn.commit()
 
-def summoners_in_league(queue, tier, division):
+def summoners_in_league(server, queue, tier, division):
     '''
     Returns a list of all puuids for each summoner in a tier and division
+    valid regions: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
     queue: 'RANKED_SOLO_5x5'
     tier: 'IRON', 'GOLD', 'MASTER', etc...
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
@@ -123,18 +150,19 @@ def summoners_in_league(queue, tier, division):
     page = 1
     summoners = []
     while True:
-        url = f'https://na1.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
+        url = f'https://{server}.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
         api_url = make_url(url)
-        resp = [ e['puuid'] for e in requests.get(api_url).json() ]
+        resp = [ [e['puuid'], e['leaguePoints']] for e in requests.get(api_url).json() ]
 
         if resp:
             summoners += resp
             page += 1
-            if page == 90:
+            if (page % 99) == 0:
                 time.sleep(120) # makes sure to not exceed request limit
         else:
             break
     return summoners
+
 
 
 
