@@ -3,6 +3,12 @@ import sqlite3
 import time
 #import pandas as pd
 
+def server_to_region(server):
+    d = {'br1': 'americas', 'eun1': 'europe', 'euw1': 'europe' , 'jp1': 'asia', 
+         'kr': 'asia', 'la1': 'americas', 'la2': 'americas', 'me1': 'asia', 
+         'na1': 'americas', 'oc1': 'asia', 'ru': 'asia', 'sg2': 'asia', 
+         'tr1': 'europe', 'tw2': 'asia', 'vn2': 'asia'}
+    return d[server]
 
 def make_url(url):
     '''
@@ -129,7 +135,7 @@ def update_db(keys, data, db):
         
     conn.commit()
 
-def summoners_in_league(region, queue, tier, division):
+def summoners_in_league(server, queue, tier, division):
     '''
     Returns a list of all puuids for each summoner in a tier and division
     valid regions: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
@@ -140,7 +146,7 @@ def summoners_in_league(region, queue, tier, division):
     page = 1
     summoners = []
     while True:
-        url = f'https://na1.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
+        url = f'https://{server}.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
         api_url = make_url(url)
         resp = [ e['puuid'] for e in requests.get(api_url).json() ]
 
