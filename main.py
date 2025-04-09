@@ -54,21 +54,18 @@ def get_ign(puuid,  region):
     return ign, tag
 
 
-def get_match_ids(puuid, region, count):
+def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
     '''
-    Returns a list of match ids with size given puuid and region
+    Returns a list of match ids for a given summoner
     valid regions: 'americas', 'apac', 'europe', 'sea'
+    start/end time: epoch in seconds
+    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
+    i: starting index to get match ids from
+    count: number of matches past index i to return
     '''
-    url = (
-        "https://" +
-        region +
-        ".api.riotgames.com/lol/match/v5/matches/by-puuid/" +
-        puuid + 
-        f"/ids?start=0&count={count}"
-    )
+    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}\
+        /startTime={start_time}&endTime={end_time}&queue={queueid}&start={i}&count={count}'
     api_url = make_url(url)
-    print(puuid)
-    page = 1
     resp = requests.get(api_url)
     match_ids = resp.json()
     return match_ids
@@ -175,7 +172,7 @@ if __name__ == '__main__':
     cursor = conn.cursor()
 
 
-    ''' habib4d_puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
+    ''' habib4d_puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'    
         SussyBaka2_puuid = "pntMCPZS4W3MPpYWYyHTkzqrod8CzRl7Cxt1QhULmyzaS_S7EmIaI19ngDu1v2NThAZhfjpTllPkEg" '''
   
     region = 'americas'
