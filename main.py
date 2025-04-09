@@ -56,18 +56,48 @@ def get_ign(puuid,  region):
 
 def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
     '''
-    Returns a list of match ids for a given summoner
+    Returns a list (size count) of match ids for a given summoner
     valid regions: 'americas', 'apac', 'europe', 'sea'
     start/end time: epoch in seconds
     queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
     i: starting index to get match ids from
     count: number of matches past index i to return
     '''
-    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}\
-        /startTime={start_time}&endTime={end_time}&queue={queueid}&start={i}&count={count}'
+    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?\
+        startTime={start_time}&endTime={end_time}&queue={queueid}&start={i}&count={count}'
     api_url = make_url(url)
     resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+        return 0
     match_ids = resp.json()
+    return match_ids
+
+def get_all_matchids(puuid, region, start_time, end_time, queueid):
+    '''
+    Returns a list of all matchids for a given summoner between start_time and end_time
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    start/end time: epoch in seconds
+    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
+    '''
+    i = 0
+    c = 1
+    match_ids = []
+
+    while True:
+        new_ids = get_match_ids(puuid, region, start_time, end_time, queueid, i, 100)
+        if new_ids == [] or new_ids == 0:
+            break
+        match_ids += new_ids
+        i += 100
+        c += 1
+
+        if c % 19 == 0:
+            time.sleep(1)
+        if c % 99 == 0:
+            time.sleep(120)
+            print('hit request limit ... wait 2 min')
+
     return match_ids
 
 def get_match_raw(match_id, region):
