@@ -11,8 +11,10 @@ def get_puuid(summoner_name, tag, region):
     url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}'
     api_url = make_url(url)
     resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+
     player_info = resp.json()
-    
     return player_info['puuid']
 
 def get_ign(puuid, region):
@@ -24,7 +26,7 @@ def get_ign(puuid, region):
     api_url = make_url(url)
     resp = requests.get(api_url)
     if resp.status_code != 200:
-        print(resp.satus_code)
+        print(f'status code: {resp.status_code}')
 
     result = resp.json()
     ign = result['gameName']
@@ -35,7 +37,7 @@ def get_ign(puuid, region):
 def summoners_in_league(server, queue, tier, division, rcounter):
     '''
     Returns a list of all puuids for each summoner in a tier and division
-    valid regions: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
     queue: 'RANKED_SOLO_5x5'
     tier: 'IRON', 'GOLD', 'MASTER', etc...
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier

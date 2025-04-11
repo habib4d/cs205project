@@ -18,7 +18,7 @@ def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
     resp = requests.get(api_url)
     if resp.status_code != 200:
         print(f'status code: {resp.status_code}')
-        return 0
+
     match_ids = resp.json()
     return match_ids
 
@@ -62,8 +62,10 @@ def get_match_raw(match_id, region):
         match_id
     )
     api_url = make_url(url)
-
     resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+        
     match_data = resp.json()
     return match_data
 

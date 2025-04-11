@@ -29,8 +29,9 @@ def get_conn():
 def add_puuids_to_summoners(server, tier, division, rcounter):
     '''
     Adds each summoner in tier/division from given server to summoners database
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
     tier: 'IRON', 'GOLD', 'MASTER', etc...
-    division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
+    division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier 
     '''
     summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
     region = server_to_region(server)
@@ -123,10 +124,10 @@ def add_summoner_matches_to_table_date_range(puuid, region, qid, date_start, dat
         _, rcounter = add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter)
         date += timedelta(days=1)
 
-    return rcounter
+    return 1, rcounter
 
 
 if __name__ == '__main__':
     puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
-    date = datetime(2025, 4, 1)
-    date_end = datetime(2025, 4, 12)
+    status, rcounter = add_puuids_to_summoners('na1', 'CHALLENGER', 'I', 0)
+    print(f'status: {status}\nrcounter: {rcounter}')
