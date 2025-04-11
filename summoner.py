@@ -48,15 +48,20 @@ def summoners_in_league(server, queue, tier, division, rcounter):
     while True:
         url = f'https://{server}.api.riotgames.com/lol/league-exp/v4/entries/{queue}/{tier}/{division}?page={page}'
         api_url = make_url(url)
-        resp = [ [e['puuid'], e['leaguePoints']] for e in requests.get(api_url).json() ]
+        resp = requests.get(api_url)
+        if resp.status_code != 200:
+            print(f'status code: {resp.status_code}')
+        
+        data = [ [e['puuid'], e['leaguePoints']] for e in resp.json() ]
         rcounter += 1
 
-        if resp:
-            summoners += resp
+        if data:
+            summoners += data
             page += 1
             if rcounter % 20 == 0:
                 time.sleep(1)
             if rcounter % 100 == 0:
+                print('request limit reached ... 2 min wait')
                 time.sleep(120)
         else:
             break

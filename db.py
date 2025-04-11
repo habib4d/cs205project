@@ -35,7 +35,6 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
     '''
     summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
     region = server_to_region(server)
-
     conn = get_conn()
     cur = conn.cursor()
 
