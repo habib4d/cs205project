@@ -26,29 +26,31 @@ def get_conn():
     conn.autocommit = False
     return conn
 
-def add_puuids_to_summoners(server, tier, division):
+def add_puuids_to_summoners(server, tier, division, rcounter):
     '''
     Adds each summoner in tier/division from given server to summoners database
     tier: 'IRON', 'GOLD', 'MASTER', etc...
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
     '''
-    summoners = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division)
+    summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
     region = server_to_region(server)
-    time.sleep(122)
 
     conn = get_conn()
     cur = conn.cursor()
-    c = 1
+
     for summoner in summoners:
         puuid = summoner[0]
         lp = summoner[1]
 
-        if (c % 19) == 0:
-            time.sleep(2)
-        if (c % 99) == 0:
+        if rcounter % 20 == 0:
+            time.sleep(1)
+        if rcounter % 100 == 0:
             print('hit request limit ... 2 min wait')
-            time.sleep(122) # makes sure to not exceed request limit
+            time.sleep(120) # makes sure to not exceed request limit
+
         player_info = get_ign(puuid, region)
+        rcounter += 1
+
         ign = player_info[0]
         tag = player_info[1]
         
@@ -58,15 +60,14 @@ def add_puuids_to_summoners(server, tier, division):
         except mariadb.Error as e:
             print(f"Database error: {e}")
             conn.close()
-            return 0
-        c += 1
+            return 0, rcounter
 
     conn.commit()
     conn.close()
-    return 1
+    return 1, rcounter
 
-def update_lp_in_summoners_table(server, tier, division):
-    summoners = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division)
+def update_lp_in_summoners_table(server, tier, division, rcounter):
+    summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
 
     conn = get_conn()
     cur = conn.cursor()
@@ -80,11 +81,11 @@ def update_lp_in_summoners_table(server, tier, division):
         except mariadb.Error as e:
             print(f"Database error: {e}")
             conn.close()
-            return 0
+            return 0, rcounter
         
     conn.commit()
     conn.close()
-    return 1
+    return 1, rcounter
 
 def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
     '''
@@ -94,7 +95,7 @@ def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
     date: datetime object
     '''
     start_time, end_time = date_to_epoch_range(date)
-    match_ids = get_all_matchids(puuid, region, start_time, end_time, qid)
+    match_ids, rcounter = get_all_matchids(puuid, region, start_time, end_time, qid, rcounter)
 
     conn = get_conn()
     cur = conn.cursor()
@@ -123,8 +124,6 @@ def add_summoner_matches_to_table_date_range(puuid, region, qid, date_start, dat
         date += timedelta(days=1)
 
     return rcounter
-
-    
 
 
 if __name__ == '__main__':

@@ -22,32 +22,33 @@ def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
     match_ids = resp.json()
     return match_ids
 
-def get_all_matchids(puuid, region, start_time, end_time, queueid):
+def get_all_matchids(puuid, region, start_time, end_time, queueid, rcounter):
     '''
     Returns a list of all matchids for a given summoner between start_time and end_time
     valid regions: 'americas', 'apac', 'europe', 'sea'
     start/end time: epoch in seconds
     queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
     '''
+    rcounter = rcounter
     i = 0
-    c = 1
     match_ids = []
 
     while True:
         new_ids = get_match_ids(puuid, region, start_time, end_time, queueid, i, 100)
+        rcounter 
         if new_ids == [] or new_ids == 0:
             break
         match_ids += new_ids
         i += 100
-        c += 1
+        rcounter += 1
 
-        if c % 19 == 0:
+        if rcounter % 20 == 0:
             time.sleep(1)
-        if c % 99 == 0:
+        if rcounter % 100 == 0:
             time.sleep(120)
             print('hit request limit ... wait 2 min')
 
-    return match_ids
+    return match_ids, rcounter
 
 def get_match_raw(match_id, region):
     '''
