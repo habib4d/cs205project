@@ -9,7 +9,6 @@ TIERS = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD'
          'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER']
 DIVISIONS = ['IV', 'III', 'II', 'I']
 
-
 def add_all_puuids_to_db(rcounter):
     '''Adds every summoner with a rank to summoners table'''
     for tier in TIERS:
@@ -32,10 +31,14 @@ def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
 
 
 if __name__ == '__main__':
-    start_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
-    end_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
-    status, rcounter = add_all_ranked_matches_to_db(start_date, end_date, 0)
-    print(f'status: {status}\nrcounter: {rcounter}')
+    pass
+    # start_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
+    # end_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
+    # status, rcounter = add_all_ranked_matches_to_db(start_date, end_date, 0)
+    # print(f'status: {status}\nrcounter: {rcounter}')
+
+    # ---------------------------------------
+
     # mydb = 'stats.db'
     # conn = sqlite3.connect(mydb)
     # cursor = conn.cursor()

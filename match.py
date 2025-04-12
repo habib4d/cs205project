@@ -1,6 +1,8 @@
 import requests
 import time
-from helper_functions import make_url
+import pprint
+import json
+from helper_functions import make_url, get_item_names
 
 
 def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
@@ -64,37 +66,76 @@ def get_match_raw(match_id, region):
     resp = requests.get(api_url)
     if resp.status_code != 200:
         print(f'status code: {resp.status_code}')
+        return 0
         
     match_data = resp.json()
     return match_data
 
-def find_player_data(match_data, puuid):
-    '''
-    Given match data and a puuid for a player from that match returns a list
-    return list: [champion played, kills, deaths, assists, win/loss]
-    '''
-    players = match_data['metadata']['participants']
-    i = players.index(puuid)
+def get_items_from_player_index(match_raw, idx):
+    ''' Returns a list of item ids given a summoner index '''
+    item_ids = []
+    for i in range(7):
+        id = match_raw['info']['participants'][idx][f'item{i}']
+        item_ids.append(id)
+    return item_ids
 
-    player_data = match_data['info']['participants'][i]
-    champion = player_data['championName']
-    k = player_data['kills']
-    d = player_data['deaths']
-    a = player_data['assists']
-    win = player_data['win']
+def get_items_all_summoners(match_raw):
+    items = []
+    for i in range(10):
+        items.append(get_items_from_player_index(match_raw, i))
+    return items
 
-    return [champion, k, d, a, win]
+if __name__ == '__main__':
+    match_id = 'NA1_5264134274'
+    region = 'americas'
 
-def get_match_data(puuid, match_ids, region):
-    keys = ['champion', 'kills', 'deaths', 'assists', 'win']
-    data = { key: [] for key in keys }
-    for id in match_ids:
-        raw_data = get_match_raw(id, region)
-        player_data = find_player_data(raw_data, puuid)
+    data = get_match_raw(match_id, region)
+    items = get_items_all_summoners(data)
+    
+    for item_ids in items:
+        item_names = get_item_names(item_ids)
+        print(item_names)
 
-        for i in range(len(player_data)):
-            key = keys[i]
-            stat = player_data[i]
-            data[key].append(stat)
 
-    return keys, data
+
+
+
+
+
+
+
+
+
+
+
+
+# def find_player_data(match_data, puuid):
+#     '''
+#     Given match data and a puuid for a player from that match returns a list
+#     return list: [champion played, kills, deaths, assists, win/loss]
+#     '''
+#     players = match_data['metadata']['participants']
+#     i = players.index(puuid)
+
+#     player_data = match_data['info']['participants'][i]
+#     champion = player_data['championName']
+#     k = player_data['kills']
+#     d = player_data['deaths']
+#     a = player_data['assists']
+#     win = player_data['win']
+
+#     return [champion, k, d, a, win]
+
+# def get_match_data(puuid, match_ids, region):
+#     keys = ['champion', 'kills', 'deaths', 'assists', 'win']
+#     data = { key: [] for key in keys }
+#     for id in match_ids:
+#         raw_data = get_match_raw(id, region)
+#         player_data = find_player_data(raw_data, puuid)
+
+#         for i in range(len(player_data)):
+#             key = keys[i]
+#             stat = player_data[i]
+#             data[key].append(stat)
+
+#     return keys, data
