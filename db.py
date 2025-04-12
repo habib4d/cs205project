@@ -2,7 +2,6 @@ import sys
 import mariadb
 import time
 from datetime import datetime, timedelta
-from main import *
 from helper_functions import *
 from summoner import *
 from match import *
@@ -66,6 +65,22 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
     conn.close()
     return 1, rcounter
 
+def get_all_puuids_from_db():
+    '''returns a list of all puuids in the summoners table'''
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''select puuid from summoners''')
+    except mariadb.Error as e:
+        print(f"Database error: {e}")
+        conn.close()
+        return 0, rcounter
+    
+    puuids = cur.fetchall()
+    conn.close()
+    return puuids
+
 def update_lp_in_summoners_table(server, tier, division, rcounter):
     summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
 
@@ -95,11 +110,10 @@ def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
     date: datetime object
     '''
     start_time, end_time = date_to_epoch_range(date)
-    match_ids, rcounter = get_all_matchids(puuid, region, start_time, end_time, qid, rcounter)
+    match_ids, rcounter = get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, qid, rcounter)
 
     conn = get_conn()
     cur = conn.cursor()
-
     for id in match_ids:
         try:
             cur.execute('''insert ignore into matches (match_id, queue_id, d) values (?, ?, ?)''', (id, qid, date))

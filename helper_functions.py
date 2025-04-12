@@ -25,12 +25,9 @@ def date_to_epoch_range(date: datetime):
     converts date object to epoch (seconds) range
     '''
     t0 = date.timestamp()
-    return t0, t0 + 86399
+    return int(t0), int(t0 + 86399)
 
 if __name__ == '__main__':
-    date = datetime(2025, 4, 11, tzinfo=ZoneInfo('America/Los_Angeles'))
-    utc = timezone.utc
-    new_date = date.astimezone(utc)
+    date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     print(date_to_epoch_range(date))
-    print(date_to_epoch_range(new_date))
 

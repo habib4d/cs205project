@@ -3,7 +3,7 @@ import time
 from helper_functions import make_url
 
 
-def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
+def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
     '''
     Returns a list (size count) of match ids for a given summoner
     valid regions: 'americas', 'apac', 'europe', 'sea'
@@ -12,17 +12,18 @@ def get_match_ids(puuid, region, start_time, end_time, queueid, i, count):
     i: starting index to get match ids from
     count: number of matches past index i to return
     '''
-    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?\
-        startTime={start_time}&endTime={end_time}&queue={queueid}&start={i}&count={count}'
+    url = (f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/' + 
+           f'ids?startTime={start_time}&endTime={end_time}&queue={queueid}&start={i}&count={count}')
     api_url = make_url(url)
     resp = requests.get(api_url)
     if resp.status_code != 200:
         print(f'status code: {resp.status_code}')
+        return 0
 
     match_ids = resp.json()
     return match_ids
 
-def get_all_matchids(puuid, region, start_time, end_time, queueid, rcounter):
+def get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, queueid, rcounter):
     '''
     Returns a list of all matchids for a given summoner between start_time and end_time
     valid regions: 'americas', 'apac', 'europe', 'sea'
@@ -34,20 +35,18 @@ def get_all_matchids(puuid, region, start_time, end_time, queueid, rcounter):
     match_ids = []
 
     while True:
-        new_ids = get_match_ids(puuid, region, start_time, end_time, queueid, i, 100)
-        rcounter 
+        new_ids = get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, 100)
+        rcounter += 1
         if new_ids == [] or new_ids == 0:
             break
         match_ids += new_ids
         i += 100
-        rcounter += 1
 
         if rcounter % 20 == 0:
             time.sleep(1)
         if rcounter % 100 == 0:
-            time.sleep(120)
             print('hit request limit ... wait 2 min')
-
+            time.sleep(120)
     return match_ids, rcounter
 
 def get_match_raw(match_id, region):
