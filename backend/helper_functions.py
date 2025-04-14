@@ -33,12 +33,12 @@ def write_items_file():
     ''' Stores most recent item info into items.json '''
     url = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/data/en_US/item.json'
     item_data = requests.get(url).json()
-    with open('items.json', 'w') as f:
+    with open('../loldata/items.json', 'w') as f:
         json.dump(item_data, f, indent=4)
     return 1
 
 def read_item_file():
-    with open('items.json', 'r') as f:
+    with open('../loldata/items.json', 'r') as f:
         item_data = json.load(f)
     return item_data['data']
 
