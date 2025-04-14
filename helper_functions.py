@@ -15,7 +15,6 @@ def make_url(url):
     c = '?'
     if c in url:
         c = '&'
-
     return f'{url}{c}api_key={api_key}'
 
 def server_to_region(server):
@@ -52,7 +51,7 @@ def get_item_names(item_ids):
     for id in item_ids:
         if type(id) != str:
             id = str(id)
-            
+
         if id == '0':
             item_names.append(None)
         else:

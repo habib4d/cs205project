@@ -71,7 +71,7 @@ def get_match_raw(match_id, region):
     match_data = resp.json()
     return match_data
 
-def get_items_from_player_index(match_raw, idx):
+def get_end_items_from_player_index(match_raw, idx):
     ''' Returns a list of item ids given a summoner index '''
     item_ids = []
     for i in range(7):
@@ -79,10 +79,10 @@ def get_items_from_player_index(match_raw, idx):
         item_ids.append(id)
     return item_ids
 
-def get_items_all_summoners(match_raw):
+def get_end_items_all_summoners(match_raw):
     items = []
     for i in range(10):
-        items.append(get_items_from_player_index(match_raw, i))
+        items.append(get_end_items_from_player_index(match_raw, i))
     return items
 
 if __name__ == '__main__':
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     region = 'americas'
 
     data = get_match_raw(match_id, region)
-    items = get_items_all_summoners(data)
+    items = get_end_items_all_summoners(data)
     
     for item_ids in items:
         item_names = get_item_names(item_ids)
