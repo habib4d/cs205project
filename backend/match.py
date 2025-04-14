@@ -1,9 +1,8 @@
 import requests
 import time
-import pprint
+from pprint import pprint
 import json
-from helper_functions import make_url, get_item_names
-
+from helper_functions import *
 
 def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
     '''
@@ -87,18 +86,48 @@ def get_match_timeline(match_id, region):
     timeline = resp.json()
     return timeline
 
+def timeline_participant_to_puuid(timeline):
+    '''
+    Retruns a dictionary key: participantId, value: puuid
+    '''
+    dict = {}
+    for d in timeline['info']['participants']:
+        id = d['participantId']
+        puuid = d['puuid']
+        dict[id] = puuid
+    return dict
+            
+
 def get_item_purchase_timeline(match_id, region):
     '''
-    Returns a list of all item purchases\n
+    Returns a dict with puuid to list of item ids\n
     valid regions: 'americas', 'apac', 'europe', 'sea'
     '''
-    items = []
     timeline = get_match_timeline(match_id, region)
+    item_data = read_item_file()
+    pairing = timeline_participant_to_puuid(timeline)
+
+    items = []
     for frame in timeline['info']['frames']:
         for event in frame['events']:
             if 'itemId' in event:
                 items.append(event)
-    return(items)
+    
+    item_dict = { puuid: [] for puuid in pairing.values() }
+    for item in items:
+        if item['type'] == 'ITEM_PURCHASED':
+            itemId = str(item['itemId'])
+            data = item_data[itemId]
+            if 'depth' in data and data['depth'] == 3:
+                participantId = item['participantId']
+                puuid = pairing[participantId]
+                item_dict[puuid].append(itemId)
+    return item_dict
+
+def itemid_dict_to_name_dict(item_dict):
+    for puuid in item_dict:
+        item_dict[puuid] = get_item_names(item_dict[puuid])
+    return item_dict
 
 def get_end_items_from_player_index(match_raw, idx):
     ''' Returns a list of item ids given a summoner index '''
@@ -118,8 +147,10 @@ if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
+            
     items = get_item_purchase_timeline(match_id, region)
-    print(items)
+    items = itemid_dict_to_name_dict(items)
+    pprint(items)
         
 
 
