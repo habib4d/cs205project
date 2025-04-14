@@ -27,9 +27,9 @@ def get_conn():
 
 def add_puuids_to_summoners(server, tier, division, rcounter):
     '''
-    Adds each summoner in tier/division from given server to summoners database
-    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
-    tier: 'IRON', 'GOLD', 'MASTER', etc...
+    Adds each summoner in tier/division from given server to summoners database\n
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2\n
+    tier: 'IRON', 'GOLD', 'MASTER', etc...\n
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier 
     '''
     summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
@@ -104,9 +104,9 @@ def update_lp_in_summoners_table(server, tier, division, rcounter):
 
 def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
     '''
-    Adds all matchids for a given summoner on day date to matches table
-    valid regions: 'americas', 'apac', 'europe', 'sea'
-    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
+    Adds all matchids for a given summoner on day date to matches table\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'\n
+    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json\n
     date: datetime object
     '''
     start_time, end_time = date_to_epoch_range(date)
@@ -127,10 +127,10 @@ def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
 
 def add_summoner_matches_to_table_date_range(puuid, region, qid, date_start, date_end, rcounter):
     '''
-    Adds all matchids for a given summoner from date range (inclusive) to matches table
-    valid regions: 'americas', 'apac', 'europe', 'sea'
-    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
-    date_start/end: datetime object
+    Adds all matchids for a given summoner from date range (inclusive) to matches table\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'\n
+    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json\n
+    date_start/end: datetime object\n
     '''
     date = date_start
     while date <= date_end:

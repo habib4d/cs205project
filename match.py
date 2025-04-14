@@ -7,11 +7,11 @@ from helper_functions import make_url, get_item_names
 
 def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
     '''
-    Returns a list (size count) of match ids for a given summoner
-    valid regions: 'americas', 'apac', 'europe', 'sea'
-    start/end time: epoch in seconds
-    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
-    i: starting index to get match ids from
+    Returns a list (size count) of match ids for a given summoner\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'\n
+    start/end time: epoch in seconds\n
+    queueid: see https://static.developer.riotgames.com/docs/lol/queues.json\n
+    i: starting index to get match ids from\n
     count: number of matches past index i to return
     '''
     url = (f'https://{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/' + 
@@ -27,9 +27,9 @@ def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, co
 
 def get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, queueid, rcounter):
     '''
-    Returns a list of all matchids for a given summoner between start_time and end_time
-    valid regions: 'americas', 'apac', 'europe', 'sea'
-    start/end time: epoch in seconds
+    Returns a list of all matchids for a given summoner between start_time and end_time\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'\n
+    start/end time: epoch in seconds\n
     queueid: see https://static.developer.riotgames.com/docs/lol/queues.json
     '''
     rcounter = rcounter
@@ -53,7 +53,7 @@ def get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, que
 
 def get_match_raw(match_id, region):
     '''
-    Returns a dictionary of all of the match data given match_id and region
+    Returns a dictionary of all of the match data given match_id and region\n
     valid regions: 'americas', 'apac', 'europe', 'sea'
     '''
     url = (
@@ -71,7 +71,36 @@ def get_match_raw(match_id, region):
     match_data = resp.json()
     return match_data
 
-def get_items_from_player_index(match_raw, idx):
+def get_match_timeline(match_id, region):
+    '''
+    Returns match timeline given match_id\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    '''
+    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/{match_id}/timeline'
+    api_url = make_url(url)
+
+    resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+        return 0
+        
+    timeline = resp.json()
+    return timeline
+
+def get_item_purchase_timeline(match_id, region):
+    '''
+    Returns a list of all item purchases\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    '''
+    items = []
+    timeline = get_match_timeline(match_id, region)
+    for frame in timeline['info']['frames']:
+        for event in frame['events']:
+            if 'itemId' in event:
+                items.append(event)
+    return(items)
+
+def get_end_items_from_player_index(match_raw, idx):
     ''' Returns a list of item ids given a summoner index '''
     item_ids = []
     for i in range(7):
@@ -79,23 +108,19 @@ def get_items_from_player_index(match_raw, idx):
         item_ids.append(id)
     return item_ids
 
-def get_items_all_summoners(match_raw):
+def get_end_items_all_summoners(match_raw):
     items = []
     for i in range(10):
-        items.append(get_items_from_player_index(match_raw, i))
+        items.append(get_end_items_from_player_index(match_raw, i))
     return items
 
 if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
-    data = get_match_raw(match_id, region)
-    items = get_items_all_summoners(data)
-    
-    for item_ids in items:
-        item_names = get_item_names(item_ids)
-        print(item_names)
-
+    items = get_item_purchase_timeline(match_id, region)
+    print(items)
+        
 
 
 
