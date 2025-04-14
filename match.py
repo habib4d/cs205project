@@ -76,7 +76,29 @@ def get_match_timeline(match_id, region):
     Returns match timeline given match_id\n
     valid regions: 'americas', 'apac', 'europe', 'sea'
     '''
-    pass
+    url = f'https://{region}.api.riotgames.com/lol/match/v5/matches/{match_id}/timeline'
+    api_url = make_url(url)
+
+    resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+        return 0
+        
+    timeline = resp.json()
+    return timeline
+
+def get_item_purchase_timeline(match_id, region):
+    '''
+    Returns a list of all item purchases\n
+    valid regions: 'americas', 'apac', 'europe', 'sea'
+    '''
+    items = []
+    timeline = get_match_timeline(match_id, region)
+    for frame in timeline['info']['frames']:
+        for event in frame['events']:
+            if 'itemId' in event:
+                items.append(event)
+    return(items)
 
 def get_end_items_from_player_index(match_raw, idx):
     ''' Returns a list of item ids given a summoner index '''
@@ -96,7 +118,9 @@ if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
-
+    items = get_item_purchase_timeline(match_id, region)
+    print(items)
+        
 
 
 
