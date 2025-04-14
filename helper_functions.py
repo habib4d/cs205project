@@ -25,9 +25,7 @@ def server_to_region(server):
     return d[server]
 
 def date_to_epoch_range(date: datetime):
-    '''
-    converts date object to epoch (seconds) range
-    '''
+    '''Converts date object to epoch (seconds) range'''
     t0 = date.timestamp()
     return int(t0), int(t0 + 86399)
 

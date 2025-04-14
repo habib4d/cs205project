@@ -18,7 +18,7 @@ def add_all_puuids_to_db(rcounter):
 
 def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
     '''
-    Adds every match within date range from 
+    Adds every match within date range from\n
     summoners in summoner table to matches table
     '''
     puuids = get_all_puuids_from_db()

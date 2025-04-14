@@ -5,7 +5,7 @@ from helper_functions import make_url
 
 def get_puuid(summoner_name, tag, region):
     '''
-    Returns puuid given name#tag and region
+    Returns puuid given name#tag and region\n
     valid regions: 'americas', 'asia', 'europe', 'esports'
     '''
     url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{summoner_name}/{tag}'
@@ -19,7 +19,7 @@ def get_puuid(summoner_name, tag, region):
 
 def get_ign(puuid, region):
     '''
-    Returns ign and tag geven puuid and region
+    Returns ign and tag geven puuid and region\n
     valid regions: 'americas', 'asia', 'europe', 'esports'
     '''
     url = f'https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}'
@@ -36,10 +36,10 @@ def get_ign(puuid, region):
 
 def summoners_in_league(server, queue, tier, division, rcounter):
     '''
-    Returns a list of all puuids for each summoner in a tier and division
-    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
-    queue: 'RANKED_SOLO_5x5'
-    tier: 'IRON', 'GOLD', 'MASTER', etc...
+    Returns a list of all puuids for each summoner in a tier and division\n
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2\n
+    queue: 'RANKED_SOLO_5x5'\n
+    tier: 'IRON', 'GOLD', 'MASTER', etc...\n
     division: 'I', 'II', 'III', or 'IV', use 'I' for MASTER+ tier
     '''
     rcounter = rcounter
