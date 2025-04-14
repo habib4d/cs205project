@@ -1,0 +1,62 @@
+import requests
+import json
+from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
+from pprint import pprint
+
+
+def make_url(url):
+    '''
+    Adds an api key to a url
+    '''
+    with open('.api_key.txt', 'r') as f:
+        api_key = f.read()
+
+    c = '?'
+    if c in url:
+        c = '&'
+    return f'{url}{c}api_key={api_key}'
+
+def server_to_region(server):
+    d = {'br1': 'americas', 'eun1': 'europe', 'euw1': 'europe' , 'jp1': 'asia', 
+         'kr': 'asia', 'la1': 'americas', 'la2': 'americas', 'me1': 'asia', 
+         'na1': 'americas', 'oc1': 'asia', 'ru': 'asia', 'sg2': 'asia', 
+         'tr1': 'europe', 'tw2': 'asia', 'vn2': 'asia'}
+    return d[server]
+
+def date_to_epoch_range(date: datetime):
+    '''Converts date object to epoch (seconds) range'''
+    t0 = date.timestamp()
+    return int(t0), int(t0 + 86399)
+
+def write_items_file():
+    ''' Stores most recent item info into items.json '''
+    url = 'https://ddragon.leagueoflegends.com/cdn/15.7.1/data/en_US/item.json'
+    item_data = requests.get(url).json()
+    with open('items.json', 'w') as f:
+        json.dump(item_data, f, indent=4)
+    return 1
+
+def read_item_file():
+    with open('items.json', 'r') as f:
+        item_data = json.load(f)
+    return item_data['data']
+
+def get_item_names(item_ids):
+    ''' Gets a list of item names from a list of item ids '''
+    item_data = read_item_file()
+    item_names = []
+    for id in item_ids:
+        if type(id) != str:
+            id = str(id)
+
+        if id == '0':
+            item_names.append(None)
+        else:
+            item_names.append(item_data[id]['name'])
+    return item_names
+
+if __name__ == '__main__':
+    date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
+    print(date_to_epoch_range(date))
+
