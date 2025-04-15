@@ -56,6 +56,10 @@ def get_item_names(item_ids):
             item_names.append(item_data[id]['name'])
     return item_names
 
+def item_str_to_list(item_string):
+    '''Converts item string to list of item ids (each itemId must have len 4)'''
+    return [item_string[i:i+n] for i in range(0, len(item_string), 4)]
+
 if __name__ == '__main__':
     date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     print(date_to_epoch_range(date))
