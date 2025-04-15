@@ -97,31 +97,53 @@ def timeline_participant_to_puuid(timeline):
         dict[id] = puuid
     return dict
             
-
-def get_item_purchase_timeline(match_id, region):
-    '''
-    Returns a dict with puuid to list of item ids\n
-    valid regions: 'americas', 'apac', 'europe', 'sea'
-    '''
-    timeline = get_match_timeline(match_id, region)
+def get_starting_items(timeline):
+    '''Returns a dict with puuid to list of starting item'''
     item_data = read_item_file()
     pairing = timeline_participant_to_puuid(timeline)
 
     items = []
-    for frame in timeline['info']['frames']:
-        for event in frame['events']:
-            if 'itemId' in event:
-                items.append(event)
-    
+    frame = timeline['info']['frames'][1]
+    for event in frame['events']:
+        if 'itemId' in event:
+            items.append(event)
+
     item_dict = { puuid: [] for puuid in pairing.values() }
     for item in items:
         if item['type'] == 'ITEM_PURCHASED':
             itemId = str(item['itemId'])
             data = item_data[itemId]
-            if 'depth' in data and data['depth'] == 3:
+            if 'into' not in data:
                 participantId = item['participantId']
                 puuid = pairing[participantId]
                 item_dict[puuid].append(itemId)
+    return item_dict
+
+def get_legendary_items(timeline):
+    '''Returns a dict with puuid to list of item ids\n'''
+    item_data = read_item_file()
+    pairing = timeline_participant_to_puuid(timeline)
+
+    items = []
+    for frame in timeline['info']['frames'][2:]:
+        for event in frame['events']:
+            if 'itemId' in event:
+                items.append(event)
+
+    
+    item_dict = { puuid: [] for puuid in pairing.values() }
+    for item in items:
+        if item['type'] == 'ITEM_PURCHASED':
+            itemId = str(item['itemId'])
+            if itemId in ['1083']:
+                # removes cull
+                continue
+            data = item_data[itemId]
+            if 'into' not in data:
+                if 'Trinket' not in data['tags'] and 'Consumable' not in data['tags']:
+                    participantId = item['participantId']
+                    puuid = pairing[participantId]
+                    item_dict[puuid].append(itemId)
     return item_dict
 
 def itemid_dict_to_name_dict(item_dict):
@@ -147,8 +169,8 @@ if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
-            
-    items = get_item_purchase_timeline(match_id, region)
+    timeline = get_match_timeline(match_id, region)
+    items = get_legendary_items(timeline)
     items = itemid_dict_to_name_dict(items)
     pprint(items)
         
