@@ -69,10 +69,16 @@ def get_end_items_all_summoners(match_raw):
         items.append(get_end_items_from_player_index(match_raw, i))
     return items
 
+def gen_item_match_data(timeline):
+    starting_items = get_starting_items(timeline)
+    legendary_items = get_legendary_items(timeline)
+    return starting_items, legendary_items
+    
+
 if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
     timeline = get_match_timeline(match_id, region)
-    items = get_starting_items(timeline)
-    pprint(items)
+    items = gen_item_match_data(timeline)
+    

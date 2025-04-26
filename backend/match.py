@@ -3,6 +3,7 @@ import time
 from pprint import pprint
 import json
 from helper_functions import *
+from items import *
 
 def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
     '''
@@ -70,6 +71,28 @@ def get_match_raw(match_id, region):
     match_data = resp.json()
     return match_data
 
+def puuid_to_match_raw_index(match_data):
+    '''Returns dictionary puuid: idx'''
+    d = {}
+    i = 0
+    for puuid in match_data['metadata']['participants']:
+        d[puuid] = i
+        i += 1
+    return d
+
+def puuid_to_match_data(match_data):
+    '''Returns dictionary pairing puuid to championId'''
+    d = {}
+    pairing = puuid_to_match_raw_index(match_data)
+    for puuid in pairing:
+        idx = pairing[puuid]
+        championId = match_data['info']['participants'][idx]['championId']
+        position = match_data['info']['participants'][idx]['teamPosition']
+        win = match_data['info']['participants'][idx]['teamPosition']
+        trinket = data['info']['participants'][idx]['item6']
+        d[puuid] = {'championId': championId, 'position': position, 'win': win, 'trinket': trinket}
+    return d
+
 def get_match_timeline(match_id, region):
     '''
     Returns match timeline given match_id\n
@@ -96,22 +119,23 @@ def timeline_participant_to_puuid(timeline):
         puuid = d['puuid']
         dict[id] = puuid
     return dict
-        
+
+def gen_all_match_data(timeline):
+    '''
+    Returns dictionary key: puuid, vlaue: dict{starting_items, legendary items, champion}
+    '''
+    pass
 
 if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
+    data = get_match_raw(match_id, region)
+    for key in data['info']['participants'][0]:
+        print(key)
 
-
-
-
-
-
-
-
-
-
+    for i in range(10):
+        print(data['info']['participants'][i]['item6'])
 
 
 # def find_player_data(match_data, puuid):

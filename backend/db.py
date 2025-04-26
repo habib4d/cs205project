@@ -25,6 +25,46 @@ def get_conn():
     conn.autocommit = False
     return conn
 
+def add_champs_to_db():
+    '''
+    Adds all lol champs to the db
+    '''
+    conn = get_conn()
+    cur = conn.cursor()
+    champs = read_champs_file()
+
+    for champ in champs:
+        id = champs[champ]['key']
+        short_name = champ
+        long_name = champs[champ]['name']
+
+        try:
+            cur.execute('''insert into champions(id, short_name, long_name) values (?, ?, ?)''', (id, short_name, long_name))
+        except mariadb.Error as e:
+            print(f'Database error: {e}')
+            conn.close()
+            return 0
+    conn.commit()
+    conn.close()
+    return 1
+
+def champ_id_to_short_name(champ_id):
+    '''Returns champion short name give champion id (int)'''
+    conn = get_conn()
+    cur = conn.cursor()
+    try:
+        cur.execute('''select short_name from champions where id=?''', (champ_id,))
+    except mariadb.Error as e:
+        print(f'Database error: {e}')
+        conn.close()
+        return 0
+    
+    short_name = cur.fetchall()
+    conn.close()
+    if not short_name:
+        raise ValueError('champ_id is invalid')
+    return short_name[0][0]
+    
 def add_puuids_to_summoners(server, tier, division, rcounter):
     '''
     Adds each summoner in tier/division from given server to summoners database\n
@@ -142,5 +182,3 @@ def add_summoner_matches_to_table_date_range(puuid, region, qid, date_start, dat
 
 if __name__ == '__main__':
     puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
-    status, rcounter = add_puuids_to_summoners('na1', 'CHALLENGER', 'I', 0)
-    print(f'status: {status}\nrcounter: {rcounter}')
