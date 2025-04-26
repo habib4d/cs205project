@@ -162,7 +162,8 @@ if __name__ == '__main__':
     region = 'americas'
 
     data = gen_all_match_data(match_id, 'na1', 1)
-    pprint(data)
+    for key in data:
+        print(data[key])
 
 
 # def find_player_data(match_data, puuid):

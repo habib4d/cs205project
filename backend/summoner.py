@@ -1,6 +1,7 @@
 import requests
 import time
 from helper_functions import make_url
+from pprint import pprint
 
 
 def get_puuid(summoner_name, tag, region):
@@ -76,12 +77,11 @@ def get_rank(server, puuid):
     api_url = make_url(url)
     resp = requests.get(api_url)
     if resp.status_code != 200:
-        print(f'status code: {resp.status_code}')
+        pprint(f'status code: {resp.status_code}')
 
-    result = resp.json()
-    print(result)
+    result = resp.json()[0]
     tier = result['tier']
     rank = result['rank']
-    lp = result['lp']
+    lp = result['leaguePoints']
 
     return tier, rank, lp
