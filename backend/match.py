@@ -92,7 +92,7 @@ def puuid_to_match_data(match_data, server, rcounter):
         idx = pairing[puuid]
         championId = match_data['info']['participants'][idx]['championId']
         position = match_data['info']['participants'][idx]['teamPosition']
-        win = match_data['info']['participants'][idx]['teamPosition']
+        win = match_data['info']['participants'][idx]['win']
         trinket = match_data['info']['participants'][idx]['item6']
         check_rcounter(rcounter)
         rank = get_rank(server, puuid)
@@ -140,19 +140,29 @@ def gen_all_match_data(match_id, server, rcounter):
 
     player_data = puuid_to_match_data(match_raw, server, rcounter)
     start_item_data, legendary_item_data = get_item_match_data(match_timeline)
-    all_data = {}
 
+    all_data = {}
+    ranks = []
     for puuid in player_data:
         puuid_dict = {}
         for key in player_data[puuid]:
             puuid_dict[key] = player_data[puuid][key]
-        puuid_dict['starting_items'] = ''.join(start_item_data)
+        ranks.append(puuid_dict['rank'])
+
+        starting_items = start_item_data[puuid]
+        puuid_dict['starting_items'] = ''.join(starting_items)
+
         for i in range(6):
             legendary_items = legendary_item_data[puuid]
             if i+1 > len(legendary_items):
                 break
             puuid_dict[f'item{i}'] = legendary_items[i]
         all_data[puuid] = puuid_dict
+
+    avg_rank = calc_avg_rank(ranks)
+    for puuid in all_data:
+        all_data[puuid]['avg_rank'] = avg_rank
+
     return all_data
 
 
@@ -163,7 +173,7 @@ if __name__ == '__main__':
 
     data = gen_all_match_data(match_id, 'na1', 1)
     for key in data:
-        print(data[key])
+        print(data[key], end='\n')
 
 
 # def find_player_data(match_data, puuid):
