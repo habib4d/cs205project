@@ -24,7 +24,7 @@ def get_starting_items(timeline):
     return item_dict
 
 def get_legendary_items(timeline):
-    '''Returns a dict with puuid to list of item ids\n'''
+    '''Returns a dict with puuid to list of item ids in order\n'''
     item_data = read_item_file()
     pairing = timeline_participant_to_puuid(timeline)
 
@@ -69,7 +69,7 @@ def get_end_items_all_summoners(match_raw):
         items.append(get_end_items_from_player_index(match_raw, i))
     return items
 
-def gen_item_match_data(timeline):
+def get_item_match_data(timeline):
     starting_items = get_starting_items(timeline)
     legendary_items = get_legendary_items(timeline)
     return starting_items, legendary_items
@@ -80,5 +80,5 @@ if __name__ == '__main__':
     region = 'americas'
 
     timeline = get_match_timeline(match_id, region)
-    items = gen_item_match_data(timeline)
+    items = get_item_match_data(timeline)
     

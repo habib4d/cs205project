@@ -79,6 +79,7 @@ def get_rank(server, puuid):
         print(f'status code: {resp.status_code}')
 
     result = resp.json()
+    print(result)
     tier = result['tier']
     rank = result['rank']
     lp = result['lp']

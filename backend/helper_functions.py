@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 from zoneinfo import ZoneInfo
 from datetime import datetime, timezone
 
@@ -21,6 +22,13 @@ def server_to_region(server):
          'na1': 'americas', 'oc1': 'asia', 'ru': 'asia', 'sg2': 'asia', 
          'tr1': 'europe', 'tw2': 'asia', 'vn2': 'asia'}
     return d[server]
+
+def check_rcounter(rcounter):
+    if rcounter % 20 == 0:
+        time.sleep(1)
+    if rcounter % 100 == 0:
+        print('hit request limit ... 2 min wait')
+        time.sleep(120) # makes sure to not exceed request limit
 
 def rank_to_int(rank):
     tier, division, lp = rank[0], rank[1], rank[2]
@@ -67,8 +75,8 @@ def calc_avg_rank(ranks):
     ranks_nums = []
     for rank in ranks:
         ranks_nums.append(rank_to_int(rank))
-    return sum(ranks_nums), len(ranks_nums)
-
+    avg = sum(ranks_nums) / len(ranks_nums)
+    return int_to_rank(avg)
 
 def date_to_epoch_range(date: datetime):
     '''Converts date object to epoch (seconds) range'''
@@ -117,7 +125,7 @@ def get_item_names(item_ids):
 
 def item_str_to_list(item_string):
     '''Converts item string to list of item ids (each itemId must have len 4)'''
-    return [item_string[i:i+n] for i in range(0, len(item_string), 4)]
+    return [item_string[i:i+4] for i in range(0, len(item_string), 4)]
 
 if __name__ == '__main__':
     print(write_items_file())

@@ -4,6 +4,7 @@ from pprint import pprint
 import json
 from helper_functions import *
 from items import *
+from summoner import *
 
 def get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, count):
     '''
@@ -80,8 +81,11 @@ def puuid_to_match_raw_index(match_data):
         i += 1
     return d
 
-def puuid_to_match_data(match_data):
-    '''Returns dictionary pairing puuid to championId'''
+def puuid_to_match_data(match_data, server, rcounter):
+    '''
+    Returns dictionary pairing puuid to championId \n
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
+    '''
     d = {}
     pairing = puuid_to_match_raw_index(match_data)
     for puuid in pairing:
@@ -89,8 +93,11 @@ def puuid_to_match_data(match_data):
         championId = match_data['info']['participants'][idx]['championId']
         position = match_data['info']['participants'][idx]['teamPosition']
         win = match_data['info']['participants'][idx]['teamPosition']
-        trinket = data['info']['participants'][idx]['item6']
-        d[puuid] = {'championId': championId, 'position': position, 'win': win, 'trinket': trinket}
+        trinket = match_data['info']['participants'][idx]['item6']
+        check_rcounter(rcounter)
+        rank = get_rank(server, puuid)
+        rcounter += 1
+        d[puuid] = {'championId': championId, 'position': position, 'win': win, 'trinket': trinket, 'rank': rank}
     return d
 
 def get_match_timeline(match_id, region):
@@ -120,22 +127,42 @@ def timeline_participant_to_puuid(timeline):
         dict[id] = puuid
     return dict
 
-def gen_all_match_data(timeline):
+def gen_all_match_data(match_id, server, rcounter):
     '''
-    Returns dictionary key: puuid, vlaue: dict{starting_items, legendary items, champion}
+    Returns dictionary of all data ready for db
     '''
-    pass
+    check_rcounter(rcounter)
+    match_raw = get_match_raw(match_id, server_to_region(server))
+    rcounter += 1
+    check_rcounter(rcounter)
+    match_timeline = get_match_timeline(match_id, server_to_region(server))
+    rcounter += 1
 
+    player_data = puuid_to_match_data(match_raw, server, rcounter)
+    start_item_data, legendary_item_data = get_item_match_data(match_timeline)
+    all_data = {}
+
+    for puuid in player_data:
+        puuid_dict = {}
+        for key in player_data[puuid]:
+            puuid_dict[key] = player_data[puuid][key]
+        puuid_dict['starting_items'] = ''.join(start_item_data)
+        for i in range(6):
+            legendary_items = legendary_item_data[puuid]
+            if i+1 > len(legendary_items):
+                break
+            puuid_dict[f'item{i}'] = legendary_items[i]
+        all_data[puuid] = puuid_dict
+    return all_data
+
+
+    
 if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
-    data = get_match_raw(match_id, region)
-    for key in data['info']['participants'][0]:
-        print(key)
-
-    for i in range(10):
-        print(data['info']['participants'][i]['item6'])
+    data = gen_all_match_data(match_id, 'na1', 1)
+    pprint(data)
 
 
 # def find_player_data(match_data, puuid):
