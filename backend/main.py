@@ -33,7 +33,7 @@ def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
 
 
 if __name__ == '__main__':
-    pass
+    add_all_puuids_to_db(1, 'CHALLENGER')
     # start_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # end_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # status, rcounter = add_all_ranked_matches_to_db(start_date, end_date, 0)
