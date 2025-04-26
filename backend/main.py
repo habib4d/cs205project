@@ -9,9 +9,11 @@ TIERS = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD'
          'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER']
 DIVISIONS = ['IV', 'III', 'II', 'I']
 
-def add_all_puuids_to_db(rcounter):
+def add_all_puuids_to_db(rcounter, tier):
     '''Adds every summoner with a rank to summoners table'''
-    for tier in TIERS:
+    if tier in ('MASTER', 'GRANDMASTER', 'CHALLENGER'):
+        _, rcounter = add_puuids_to_summoners('na1', tier, 'I', rcounter)
+    else:
         for div in DIVISIONS:
             _, rcounter = add_puuids_to_summoners('na1', tier, div, rcounter)
 
