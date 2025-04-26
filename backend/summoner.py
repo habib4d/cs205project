@@ -66,3 +66,21 @@ def summoners_in_league(server, queue, tier, division, rcounter):
         else:
             break
     return summoners, rcounter
+
+def get_rank(server, puuid):
+    '''
+    Returns a player's rank given server and puuid\n
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2\n
+    '''
+    url = f'https://{server}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}'
+    api_url = make_url(url)
+    resp = requests.get(api_url)
+    if resp.status_code != 200:
+        print(f'status code: {resp.status_code}')
+
+    result = resp.json()
+    tier = result['tier']
+    rank = result['rank']
+    lp = result['lp']
+
+    return tier, rank, lp
