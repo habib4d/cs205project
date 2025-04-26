@@ -115,7 +115,7 @@ def get_all_puuids_from_db():
     except mariadb.Error as e:
         print(f"Database error: {e}")
         conn.close()
-        return 0, rcounter
+        return 0
     
     puuids = cur.fetchall()
     conn.close()
