@@ -3,6 +3,7 @@ import json
 import time
 from zoneinfo import ZoneInfo
 from datetime import datetime, timezone
+from pprint import pprint
 
 def make_url(url):
     '''
@@ -95,8 +96,14 @@ def write_champs_file():
     ''' Stores most recent champ info into items.json '''
     url = 'https://ddragon.leagueoflegends.com/cdn/15.8.1/data/en_US/champion.json'
     champ_data = requests.get(url).json()
+    champ_data = champ_data['data']
+    new_data = {}
+    for key in champ_data:
+        code = champ_data[key]['key']
+        new_data[code] = champ_data[key]
+
     with open('../loldata/champs.json', 'w') as f:
-        json.dump(champ_data, f, indent=4)
+        json.dump(new_data, f, indent=4)
     return 1
 
 def read_item_file():
@@ -107,7 +114,7 @@ def read_item_file():
 def read_champs_file():
     with open('../loldata/champs.json', 'r') as f:
         champ_data = json.load(f)
-    return champ_data['data']
+    return champ_data
 
 def get_item_names(item_ids):
     ''' Gets a list of item names from a list of item ids '''
@@ -127,7 +134,25 @@ def item_str_to_list(item_string):
     '''Converts item string to list of item ids (each itemId must have len 4)'''
     return [item_string[i:i+4] for i in range(0, len(item_string), 4)]
 
+def champ_code_to_id(champ_code, champ_data):
+    if type(champ_code) != str:
+        champ_code = str(champ_code)
+    return champ_data[champ_code]['id']
+
 if __name__ == '__main__':
-    print(write_items_file())
-    print(write_champs_file())
+    pass
+
+    # Champs with more than one word in their name
+    # AurelionSol
+    # DrMundo
+    # JarvanIV
+    # LeeSin
+    # MasterYi
+    # MissFortune
+    # Nunu
+    # Renata
+    # TahmKench
+    # TwistedFate
+    # XinZhao
+    
 
