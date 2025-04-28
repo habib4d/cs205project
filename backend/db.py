@@ -80,7 +80,7 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
         puuid = summoner[0]
         lp = summoner[1]
 
-        check_rcounter()
+        check_rcounter(rcounter)
         player_info = get_ign(puuid, region)
         rcounter += 1
 

@@ -35,7 +35,7 @@ def get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, que
     match_ids = []
 
     while True:
-        check_rcounter()
+        check_rcounter(rcounter)
         new_ids = get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, 100)
         rcounter += 1
         if new_ids == [] or new_ids == 0:

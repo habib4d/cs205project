@@ -9,7 +9,7 @@ TIERS = ['IRON', 'BRONZE', 'SILVER', 'GOLD', 'PLATINUM', 'EMERALD'
          'DIAMOND', 'MASTER', 'GRANDMASTER', 'CHALLENGER']
 DIVISIONS = ['IV', 'III', 'II', 'I']
 
-def add_all_puuids_to_db(rcounter, tier):
+def add_all_puuids_to_db(tier, rcounter):
     '''Adds every summoner with a rank to summoners table'''
     if tier in ('MASTER', 'GRANDMASTER', 'CHALLENGER'):
         _, rcounter = add_puuids_to_summoners('na1', tier, 'I', rcounter)
@@ -33,7 +33,7 @@ def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
 
 
 if __name__ == '__main__':
-    add_all_puuids_to_db(1, 'CHALLENGER')
+    add_all_puuids_to_db('DIAMOND', 1)
     # start_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # end_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # status, rcounter = add_all_ranked_matches_to_db(start_date, end_date, 0)
