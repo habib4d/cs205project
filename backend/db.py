@@ -1,7 +1,6 @@
 import sys
 import mariadb
-import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from helper_functions import *
 from summoner import *
 from match import *
@@ -81,12 +80,7 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
         puuid = summoner[0]
         lp = summoner[1]
 
-        if rcounter % 20 == 0:
-            time.sleep(1)
-        if rcounter % 100 == 0:
-            print('hit request limit ... 2 min wait')
-            time.sleep(120) # makes sure to not exceed request limit
-
+        check_rcounter()
         player_info = get_ign(puuid, region)
         rcounter += 1
 
@@ -179,6 +173,50 @@ def add_summoner_matches_to_table_date_range(puuid, region, qid, date_start, dat
 
     return 1, rcounter
 
+def add_match_data(match_id, server, rcounter):
+    '''
+    Adds all match data to the champions match data tables
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
+    '''
+    all_data, rcounter = gen_all_match_data(match_id, server, rcounter)
+    champ_data = read_champs_file()
+
+    conn = get_conn()
+    cur = conn.cursor()
+    for puuid in all_data:
+        data = all_data[puuid]
+        champ_code = data['championId']
+        champ = champ_code_to_id(champ_code, champ_data)
+        print(champ)
+        position = data['position']
+        win = data['win']
+        trinket = data['trinket']
+        rank = data['rank']
+        avg_rank = data['avg_rank']
+        starting_items = None if 'starting_items' not in data else data['starting_items']
+        item0 = None if 'item0' not in data else data['item0']
+        item1 = None if 'item1' not in data else data['item1']
+        item2 = None if 'item2' not in data else data['item2']
+        item3 = None if 'item3' not in data else data['item3']
+        item4 = None if 'item4' not in data else data['item4']
+        item5 = None if 'item5' not in data else data['item5']
+
+        try:
+            query = f'''insert ignore into {champ}
+(match_id, win, position, individual_rank, game_avg_rank, starting_items, item0, item1, item2, item3, item4, item5, trinket)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
+            cur.execute(query, (match_id, win, position, rank, avg_rank, starting_items, item0, item1, item2, item3, item4, item5, trinket))
+        except mariadb.Error as e:
+            print(f'Database error: {e}')
+            conn.close()
+            return 0, rcounter
+    conn.commit()
+    conn.close()
+    return 1, rcounter
 
 if __name__ == '__main__':
     puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
+    match_id = 'NA1_5264134274'
+    server = 'na1'
+    status, rcounter = add_match_data(match_id, server, 1)
+    print(f'status: {status}\nrcounter: {rcounter}')

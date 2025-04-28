@@ -1,6 +1,6 @@
 import requests
 import time
-from helper_functions import make_url
+from helper_functions import *
 from pprint import pprint
 
 
@@ -59,11 +59,7 @@ def summoners_in_league(server, queue, tier, division, rcounter):
         if data:
             summoners += data
             page += 1
-            if rcounter % 20 == 0:
-                time.sleep(1)
-            if rcounter % 100 == 0:
-                print('request limit reached ... 2 min wait')
-                time.sleep(120)
+            check_rcounter()
         else:
             break
     return summoners, rcounter

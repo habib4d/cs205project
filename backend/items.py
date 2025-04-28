@@ -1,5 +1,15 @@
-from match import *
 from helper_functions import *
+
+def timeline_participant_to_puuid(timeline):
+    '''
+    Retruns a dictionary key: participantId, value: puuid
+    '''
+    dict = {}
+    for d in timeline['info']['participants']:
+        id = d['participantId']
+        puuid = d['puuid']
+        dict[id] = puuid
+    return dict
 
 def get_starting_items(timeline):
     '''Returns a dict with puuid to list of starting item'''
@@ -68,11 +78,6 @@ def get_end_items_all_summoners(match_raw):
     for i in range(10):
         items.append(get_end_items_from_player_index(match_raw, i))
     return items
-
-def get_item_match_data(timeline):
-    starting_items = get_starting_items(timeline)
-    legendary_items = get_legendary_items(timeline)
-    return starting_items, legendary_items
     
 
 if __name__ == '__main__':

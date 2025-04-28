@@ -1,9 +1,7 @@
 import requests
 import json
 import time
-from zoneinfo import ZoneInfo
-from datetime import datetime, timezone
-from pprint import pprint
+from datetime import datetime
 
 def make_url(url):
     '''

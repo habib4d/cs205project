@@ -1,7 +1,4 @@
 import requests
-import time
-from pprint import pprint
-import json
 from helper_functions import *
 from items import *
 from summoner import *
@@ -38,18 +35,13 @@ def get_matchids_from_puuid_epoch_range(puuid, region, start_time, end_time, que
     match_ids = []
 
     while True:
+        check_rcounter()
         new_ids = get_match_ids_from_puuid(puuid, region, start_time, end_time, queueid, i, 100)
         rcounter += 1
         if new_ids == [] or new_ids == 0:
             break
         match_ids += new_ids
         i += 100
-
-        if rcounter % 20 == 0:
-            time.sleep(1)
-        if rcounter % 100 == 0:
-            print('hit request limit ... wait 2 min')
-            time.sleep(120)
     return match_ids, rcounter
 
 def get_match_raw(match_id, region):
@@ -116,20 +108,15 @@ def get_match_timeline(match_id, region):
     timeline = resp.json()
     return timeline
 
-def timeline_participant_to_puuid(timeline):
-    '''
-    Retruns a dictionary key: participantId, value: puuid
-    '''
-    dict = {}
-    for d in timeline['info']['participants']:
-        id = d['participantId']
-        puuid = d['puuid']
-        dict[id] = puuid
-    return dict
+def get_item_match_data(timeline):
+    starting_items = get_starting_items(timeline)
+    legendary_items = get_legendary_items(timeline)
+    return starting_items, legendary_items
 
 def gen_all_match_data(match_id, server, rcounter):
     '''
     Returns dictionary of all data ready for db
+    valid servers: br1, eun1, euw1, jp1, kr, la1, la2, me1, na1, oc1, ru, sg2, tr1, tw2, vn2
     '''
     check_rcounter(rcounter)
     match_raw = get_match_raw(match_id, server_to_region(server))
@@ -162,7 +149,6 @@ def gen_all_match_data(match_id, server, rcounter):
     avg_rank = calc_avg_rank(ranks)
     for puuid in all_data:
         all_data[puuid]['avg_rank'] = avg_rank
-
     return all_data, rcounter
 
 
@@ -170,7 +156,7 @@ if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'
 
-    data = gen_all_match_data(match_id, 'na1', 1)
+    data, rcounter = gen_all_match_data(match_id, 'na1', 1)
     for key in data:
         print(data[key], end='\n')
 
