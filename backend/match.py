@@ -163,10 +163,9 @@ def gen_all_match_data(match_id, server, rcounter):
     for puuid in all_data:
         all_data[puuid]['avg_rank'] = avg_rank
 
-    return all_data
+    return all_data, rcounter
 
 
-    
 if __name__ == '__main__':
     match_id = 'NA1_5264134274'
     region = 'americas'

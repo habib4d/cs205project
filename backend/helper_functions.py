@@ -139,9 +139,30 @@ def champ_code_to_id(champ_code, champ_data):
         champ_code = str(champ_code)
     return champ_data[champ_code]['id']
 
-if __name__ == '__main__':
-    pass
+def gen_champ_table_creations_permissions():
+    champ_data = read_champs_file()
+    for key in champ_data:
+        id = champ_data[key]['id']
+        print(f'''create table {id}(
+match_id varchar(20) not null,
+win tinyint,
+position varchar(10),
+individual_rank varchar(13),
+game_avg_rank varchar(13),
+starting_items varchar(40),
+item0 int,
+item1 int,
+item2 int,
+item3 int,
+item4 int,
+item5 int,
+trinket int,
+primary key (match_id)
+);
+grant select, insert, update on lolapp.{id} to 'jhabib'@'localhost';''')
 
+if __name__ == '__main__':
+    gen_champ_table_creations_permissions()
     # Champs with more than one word in their name
     # AurelionSol
     # DrMundo
