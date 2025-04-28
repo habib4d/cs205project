@@ -88,7 +88,7 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
         tag = player_info[1]
         
         try:
-            cur.execute('''insert into summoners (puuid, ign, tag, tier, subtier, lp)
+            cur.execute('''insert into summoners (puuid, ign, tag, tier, division, lp)
                     values (?, ?, ?, ?, ?, ?)''', (puuid, ign, tag, tier, division, lp))
         except mariadb.Error as e:
             print(f"Database error: {e}")
