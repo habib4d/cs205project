@@ -187,7 +187,6 @@ def add_match_data(match_id, server, rcounter):
         data = all_data[puuid]
         champ_code = data['championId']
         champ = champ_code_to_id(champ_code, champ_data)
-        print(champ)
         position = data['position']
         win = data['win']
         trinket = data['trinket']
