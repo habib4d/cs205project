@@ -59,7 +59,7 @@ def summoners_in_league(server, queue, tier, division, rcounter):
         if data:
             summoners += data
             page += 1
-            check_rcounter()
+            check_rcounter(rcounter)
         else:
             break
     return summoners, rcounter
