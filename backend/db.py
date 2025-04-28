@@ -115,26 +115,20 @@ def get_all_puuids_from_db():
     conn.close()
     return puuids
 
-def update_lp_in_summoners_table(server, tier, division, rcounter):
-    summoners, rcounter = summoners_in_league(server, 'RANKED_SOLO_5x5', tier, division, rcounter)
-
+def update_rank(puuid, tier, division, lp):
     conn = get_conn()
     cur = conn.cursor()
 
-    for summoner in summoners:
-        puuid = summoner[0]
-        lp = summoner[1] 
-
-        try:
-            cur.execute('''update summoners set lp = ? where puuid = ?''', (lp, puuid))
-        except mariadb.Error as e:
-            print(f"Database error: {e}")
-            conn.close()
-            return 0, rcounter
+    try:
+        cur.execute('''update summoners set tier=?, division=?, lp=? where puuid = ?''', (tier, division, lp, puuid))
+    except mariadb.Error as e:
+        print(f"Database error: {e}")
+        conn.close()
+        return 0, rcounter
         
     conn.commit()
     conn.close()
-    return 1, rcounter
+    return 1
 
 def add_summoner_matches_to_table_one_day(puuid, region, qid, date, rcounter):
     '''
@@ -191,7 +185,11 @@ def add_match_data(match_id, server, rcounter):
         win = data['win']
         trinket = data['trinket']
         rank = data['rank']
-        avg_rank = data['avg_rank']
+        tier = rank[0]
+        division = rank[1]
+        lp = rank[2]
+        update_rank(puuid, tier, division, lp)
+        avg_rank = data['avg_rank'][0]
         starting_items = None if 'starting_items' not in data else data['starting_items']
         item0 = None if 'item0' not in data else data['item0']
         item1 = None if 'item1' not in data else data['item1']
@@ -204,7 +202,7 @@ def add_match_data(match_id, server, rcounter):
             query = f'''insert ignore into {champ}
 (match_id, win, position, individual_rank, game_avg_rank, starting_items, item0, item1, item2, item3, item4, item5, trinket)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
-            cur.execute(query, (match_id, win, position, rank, avg_rank, starting_items, item0, item1, item2, item3, item4, item5, trinket))
+            cur.execute(query, (match_id, win, position, tier, avg_rank, starting_items, item0, item1, item2, item3, item4, item5, trinket))
         except mariadb.Error as e:
             print(f'Database error: {e}')
             conn.close()
