@@ -56,7 +56,7 @@ def summoners_in_league(server, queue, tier, division, rcounter):
         data = [ [e['puuid'], e['leaguePoints']] for e in resp.json() ]
         rcounter += 1
 
-        if data:
+        if len(data) > 0:
             summoners += data
             page += 1
             check_rcounter(rcounter)

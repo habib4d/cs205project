@@ -81,20 +81,41 @@ def add_puuids_to_summoners(server, tier, division, rcounter):
         lp = summoner[1]
 
         check_rcounter(rcounter)
-        player_info = get_ign(puuid, region)
-        rcounter += 1
+        #player_info = get_ign(puuid, region)
+        #rcounter += 1
 
-        ign = player_info[0]
-        tag = player_info[1]
+        ign = None#player_info[0]
+        tag = None#player_info[1]
         
         try:
-            cur.execute('''insert into summoners (puuid, ign, tag, tier, division, lp)
+            cur.execute('''insert ignore into summoners (puuid, ign, tag, tier, division, lp)
                     values (?, ?, ?, ?, ?, ?)''', (puuid, ign, tag, tier, division, lp))
         except mariadb.Error as e:
             print(f"Database error: {e}")
             conn.close()
             return 0, rcounter
 
+    conn.commit()
+    conn.close()
+    return 1, rcounter
+
+def add_ign_to_summoners(server, puuid, rcounter):
+    check_rcounter(rcounter)
+    region = server_to_region(server)
+    player_info = get_ign(puuid, region)
+    rcounter += 1
+    ign = player_info[0]
+    tag = player_info[1]
+
+    conn = get_conn()
+    cur = conn.cursor()
+    try:
+        cur.execute('update summoners set ign=?, tag=? where puuid=?', (ign, tag, puuid))
+    except mariadb.Error as e:
+        print(f"Database error: {e}")
+        conn.close()
+        return 0, rcounter
+    
     conn.commit()
     conn.close()
     return 1, rcounter
@@ -211,9 +232,23 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'''
     conn.close()
     return 1, rcounter
 
+
+
 if __name__ == '__main__':
-    puuid = '8XG2EdVepNrwc4w5_BnvPWjoGsdULwNIRFKrzoBBI0oskwMlrRzHD6t4vMCZe-tKyPUVlj5_eMR8eQ'
-    match_id = 'NA1_5264134274'
-    server = 'na1'
-    status, rcounter = add_match_data(match_id, server, 1)
-    print(f'status: {status}\nrcounter: {rcounter}')
+    rcounter = 1
+    conn = get_conn()
+    cur = conn.cursor()
+
+    try:
+        cur.execute('''select puuid from summoners limit 5''')
+    except mariadb.Error as e:
+        print(f"Database error: {e}")
+        conn.close()
+
+    puuids = cur.fetchall()
+    conn.close()
+    for entry in puuids:
+        puuid = entry[0]
+        _, rcounter = add_ign_to_summoners('na1', puuid, rcounter)
+    print(rcounter)
+

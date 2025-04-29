@@ -16,6 +16,7 @@ def add_all_puuids_to_db(tier, rcounter):
     else:
         for div in DIVISIONS:
             _, rcounter = add_puuids_to_summoners('na1', tier, div, rcounter)
+    return 1, rcounter
 
 
 def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
@@ -33,11 +34,11 @@ def add_all_ranked_matches_to_db(start_date, end_date, rcounter):
 
 
 if __name__ == '__main__':
-    add_all_puuids_to_db('DIAMOND', 1)
+    status, rcounter = add_all_puuids_to_db('DIAMOND', 1)
     # start_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # end_date = datetime(2025, 4, 10, tzinfo=ZoneInfo('America/Los_Angeles'))
     # status, rcounter = add_all_ranked_matches_to_db(start_date, end_date, 0)
-    # print(f'status: {status}\nrcounter: {rcounter}')
+    print(f'status: {status}\nrcounter: {rcounter}')
 
     # ---------------------------------------
 
